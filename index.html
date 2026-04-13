@@ -2,102 +2,51 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fun Graph Game</title>
-
+<title>QUANTA FUN GAME</title>
 <link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
 
-<!-- 🎵 Background Music -->
-<audio id="bgm" loop preload="auto">
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-</audio>
+<!-- ===== MENU AWAL ===== -->
+<div id="menu">
+  <h1>🎮 QUANTA FUN GAME</h1>
+  <p>Bermain sambil belajar Grafik Fungsi Kuadrat</p>
 
-<!-- 🔊 Sound Effect -->
-<audio id="soundBenar">
-  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_3c3bdf2c8b.mp3">
-</audio>
+  <div class="ilustrasi"></div>
 
-<audio id="soundSalah">
-  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_2f0b6d3d03.mp3">
-</audio>
-
-<!-- START SCREEN -->
-<div class="container" id="start-screen">
-  <h2>🎮 Fun Graph Game</h2>
-  <p>Yuk main sebentar sebelum belajar 😄</p>
-
-  <input 
-    type="text" 
-    id="namaInput" 
-    placeholder="Masukkan nama kamu"
-    autocomplete="off"
-  >
-
-  <button id="startBtn">🚀 Mulai Game</button><button onclick="toggleMusic()">🔊 Musik ON/OFF</button>
-
+  <button onclick="startGame()">▶️ MULAI GAME</button>
 </div>
 
-<!-- GAME SCREEN -->
-<div class="container" id="game-screen" style="display:none;">
-  
-  <p id="progress"></p>
-  
+<!-- ===== GAME ===== -->
+<canvas id="gameCanvas" class="hidden"></canvas>
+
+<!-- ===== CONTROL ===== -->
+<div id="controls" class="hidden">
+  <button id="left">⬅️</button>
+  <button id="up">⬆️</button>
+  <button id="right">➡️</button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="quizBox" class="hidden">
   <h3 id="question"></h3>
-
-  <!-- GAMBAR SOAL -->
-  <img 
-    id="questionImage" 
-    style="max-width:100%; margin:10px 0; display:none; border-radius:10px;"
-  >
-
-  <!-- OPSI JAWABAN -->
-  <div id="options"></div>
-
-  <!-- FEEDBACK -->
-  <p id="feedback"></p>
-
+  <div id="answers"></div>
 </div>
 
-<!-- RESULT SCREEN -->
-<div class="container" id="result-screen" style="display:none;">
-  
-  <h2 id="resultNama"></h2>
-  
-  <h3 id="stars"></h3>
-  
-  <p id="resultScore"></p>
-  
-  <p id="resultMessage"></p>
-
-  <button onclick="location.reload()">🔄 Main Lagi</button>
-<button onclick="lihatDashboard()">📊 Lihat Dashboard</button>
+<!-- ===== UI ===== -->
+<div id="ui" class="hidden">
+  ⭐ <span id="star">0</span> |
+  🪙 <span id="coins">0</span>
 </div>
 
-<div class="container" id="dashboard-screen" style="display:none;">
-  <h2>📊 Dashboard Hasil</h2>
+<!-- ===== FEEDBACK ===== -->
+<div id="feedbackBox" class="hidden"></div>
 
-  <table border="1" width="100%" id="dataTable">
-    <thead>
-      <tr>
-        <th>Nama</th>
-        <th>Benar</th>
-        <th>Salah</th>
-        <th>Skor</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<!-- ===== RESULT ===== -->
+<div id="resultBox" class="hidden"></div>
 
-  <button onclick="downloadExcel()">⬇️ Export Excel</button>
-  <button onclick="resetDashboard()">🗑 Reset Data</button>
-<button onclick="kembaliKeAwal()">⬅️ Kembali</button>
-</div>
-
-<!-- SCRIPT -->
 <script src="script.js"></script>
-
 </body>
 </html>

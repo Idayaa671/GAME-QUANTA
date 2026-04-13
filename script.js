@@ -1,299 +1,443 @@
-document.addEventListener("DOMContentLoaded", function(){
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-let nama="";
-let currentQuestion=0;
-let benar=0;
-let salah=0;
-let isAnswered=false;
+let bgMusic = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9bfa1a.mp3?filename=game-music-loop-2-144037.mp3");
 
-const bgm=document.getElementById("bgm");
+function initAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+function beep(freq, duration=0.1){
+  if(!audioCtx) return;
+
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+
+  o.type = "sine";
+  o.frequency.value = freq;
+
+  g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+  o.connect(g);
+  g.connect(audioCtx.destination);
+
+  o.start();
+  o.stop(audioCtx.currentTime + duration);
+}
+
+function soundCoin(){ beep(1200,0.08); }
+function soundJump(){ beep(400,0.1); }
+function soundCorrect(){
+  beep(600,0.1);
+  setTimeout(()=>beep(900,0.1),100);
+}
+function soundWrong(){ beep(200,0.2); }
+
+// ================= CANVAS =================
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = 900;
+canvas.height = 400;
+
+// ================= STATE =================
+let player, cameraX = 0;
+let coinsArr = [], quizBlocks = [];
+let control = {left:false,right:false,up:false};
 
 
-document.getElementById("startBtn").addEventListener("click", startGame);
+let coins = 0;
+let star = 0;
+let inQuiz = false;
+let currentQuestion = 0;
+let gameFinished = false;
 
-const questions=[
+// ================= BANK SOAL (20) =================
+const questionBank = [
+{q:"Grafik y=x² berbentuk?",a:["Garis","Parabola"],c:1,e:"Fungsi kuadrat berbentuk parabola"},
+{q:"Jika a > 0?",a:["Ke atas","Ke bawah"],c:0,e:"a positif → atas"},
+{q:"Jika a < 0?",a:["Ke bawah","Ke atas"],c:0,e:"a negatif → bawah"},
+{q:"Titik puncak?",a:["Gradien","Vertex"],c:1,e:"Vertex = puncak"},
+{q:"Diskriminan > 0?",a:["2 akar","0 akar"],c:0,e:"Memotong di 2 titik"},
+{q:"y=x²+2 geser?",a:["Turun","Naik"],c:1,e:"+2 → ke atas"},
+{q:"y=(x-3)² geser?",a:["Kanan","Kiri"],c:0,e:"(x-3) → kanan"},
+{q:"x²-4x+4 akar?",a:["1","2"],c:0,e:"D=0 → 1 akar"},
+{q:"Sumbu simetri x²-4x?",a:["x=4","x=2"],c:1,e:"-b/2a"},
+{q:"Jika a besar?",a:["Curam","Landai"],c:0,e:"a besar → curam"},
 
-{question:"f(x)=x² grafiknya?", options:["Ke atas","Ke bawah"], answer:0,
-explainCorrect:"a>0 → ke atas", explainWrong:"a positif → ke atas"},
+{q:"y=x²-6x+9?",a:["1 titik","2 titik"],c:0,e:"D=0"},
+{q:"Parabola di atas X?",a:["Tidak ada akar","2 akar"],c:0,e:"Tidak memotong"},
+{q:"y=-x² grafik?",a:["Atas","Bawah"],c:1,e:"a negatif"},
+{q:"y=x²+4x+4 puncak?",a:["(2,0)","(-2,0)"],c:1,e:"Lengkap kuadrat"},
+{q:"y=x²+1 potong X?",a:["Tidak","Ya"],c:0,e:"Tidak punya akar"},
 
-{question:"f(x)=-x² grafiknya?", options:["Ke atas","Ke bawah"], answer:1,
-explainCorrect:"a<0 → ke bawah", explainWrong:"a negatif → ke bawah"},
-
-{question:"Bentuk grafik fungsi kuadrat?", options:["Garis","Parabola","Lingkaran"], answer:1,
-explainCorrect:"Bentuknya parabola", explainWrong:"Bukan garis/lingkaran"},
-
-{question:"f(x)=2x² dibanding x²?", options:["Lebih sempit","Lebih lebar","Sama"], answer:0,
-explainCorrect:"|a|>1 → sempit", explainWrong:"Semakin besar a makin sempit"},
-
-{question:"f(x)=0.5x²?", options:["Lebih sempit","Lebih lebar","Sama"], answer:1,
-explainCorrect:"0<|a|<1 → lebar", explainWrong:"Nilai kecil → lebar"},
-
-{question:"f(x)=x²+3 geser?", options:["Atas","Bawah","Kiri"], answer:0,
-explainCorrect:"+3 → atas", explainWrong:"Konstanta + geser atas"},
-
-{question:"f(x)=x²-4 geser?", options:["Atas","Bawah","Kanan"], answer:1,
-explainCorrect:"-4 → bawah", explainWrong:"Konstanta - geser bawah"},
-
-{question:"Grafik terbuka ke atas & puncak (0,0)?", options:["x²","-x²","x²+3"], answer:0,
-explainCorrect:"Tidak geser dan a positif", explainWrong:"Perhatikan puncak"},
-
-{question:"Bentuk ∩ berarti?", options:["Ke atas","Ke bawah"], answer:1,
-explainCorrect:"∩ → bawah", explainWrong:"Lengkungan ke bawah"},
-
-{question:"Puncak di atas (0,0)?", options:["Naik","Turun","Tetap"], answer:0,
-explainCorrect:"Geser atas", explainWrong:"Bandingkan posisi"},
-
-{question:"Jika a<0?", options:["Atas","Bawah"], answer:1,
-explainCorrect:"Negatif → bawah", explainWrong:"Ini aturan dasar"},
-
-{question:"|a| besar?", options:["Sempit","Lebar"], answer:0,
-explainCorrect:"Makin curam", explainWrong:"Lebar jika kecil"},
-
-{question:"x² dan x²+2 beda?", options:["Arah","Posisi","Bentuk"], answer:1,
-explainCorrect:"Hanya geser", explainWrong:"Bentuk sama"},
-
-{question:"-x² dan x² beda?", options:["Arah","Lebar","Potong"], answer:0,
-explainCorrect:"Arah berbeda", explainWrong:"Bukan lebar"},
-
-{question:"Yang paling mempengaruhi bentuk?", options:["a","warna","nama"], answer:0,
-explainCorrect:"a menentukan bentuk", explainWrong:"Bukan itu"}
+{q:"Bola y=-x²+4x tinggi max?",a:["x=2","x=4"],c:0,e:"-b/2a"},
+{q:"y=2x² lebih?",a:["Curam","Landai"],c:0,e:"a besar"},
+{q:"y=0x²+2?",a:["Parabola","Garis"],c:1,e:"a=0 → garis"},
+{q:"y=x²-1 potong?",a:["2 titik","1 titik"],c:0,e:"D>0"},
+{q:"Grafik parabola?",a:["Lurus","Melengkung"],c:1,e:"Parabola melengkung"}
 ];
 
+// ================= START =================
 function startGame(){
 
-  nama = document.getElementById("namaInput").value.trim();
+  document.getElementById("menu").classList.add("hidden");
+  canvas.classList.remove("hidden");
+  document.getElementById("controls").classList.remove("hidden");
+  document.getElementById("ui").classList.remove("hidden");
 
-  if(nama === ""){
-    alert("Isi nama dulu ya 😊");
-    return;
-  }
+  bgMusic.play().catch(()=>{}); // 🔥 MUSIK MULAI
 
-  // 🔥 AUTO PLAY MUSIK
-  const bgm = document.getElementById("bgm");
-  bgm.volume = 0.4;
-  bgm.currentTime = 0;
-
-  bgm.play().then(()=>{
-    console.log("Musik jalan");
-  }).catch(err=>{
-    console.log("Autoplay diblok:", err);
-  });
-
-  // pindah screen
-  document.getElementById("start-screen").style.display="none";
-  document.getElementById("game-screen").style.display="block";
-
-  showQuestion();
+  initGame();
+  initAudio();
 }
 
-function showQuestion(){
-  isAnswered=false;
+// ================= INIT =================
+function initGame(){
+  player = {x:50,y:300,w:40,h:40,dx:0,dy:0,gravity:0.8,jump:-12,grounded:true};
 
-  document.getElementById("feedback").innerHTML="";
+  coinsArr = [];
+  quizBlocks = [];
 
-  let q=questions[currentQuestion];
 
-  document.getElementById("progress").innerText=
-    "Soal "+(currentQuestion+1)+" / "+questions.length;
+ // ================= COINS =================
+coinsArr = [];
 
-  document.getElementById("question").innerText=q.question;
+let totalCoins = 80; // 🔥 lebih banyak & merata
+let mapLength = 14000; // panjang map
+
+for(let i=0;i<totalCoins;i++){
+  coinsArr.push({
+    x: 150 + Math.random()*mapLength, // 🔥 random sepanjang map
+    y: Math.random() > 0.5 ? 260 : 220, // tidak terlalu tinggi
+    collected:false
+  });
+}
+
+// ================= QUIZ BLOCK =================
+quizBlocks = [];
+
+for(let i=0;i<20;i++){
+  quizBlocks.push({
+    x: 400 + i*600,
+    y: Math.random() > 0.5 ? 260 : 180, // 🔥 atas & bawah
+    w:40,
+    h:40,
+    done:false
+  });
+}
+
+
+  setupControls();
+  loop();
+}
+
+// ================= CONTROL =================
+function setupControls(){
+
+  const leftBtn = document.getElementById("left");
+  const rightBtn = document.getElementById("right");
+  const upBtn = document.getElementById("up");
+
+  // LEFT
+  leftBtn.onpointerdown = () => control.left = true;
+  leftBtn.onpointerup = () => control.left = false;
+  leftBtn.onpointerleave = () => control.left = false;
+
+  // RIGHT
+  rightBtn.onpointerdown = () => control.right = true;
+  rightBtn.onpointerup = () => control.right = false;
+  rightBtn.onpointerleave = () => control.right = false;
+
+  // UP
+  upBtn.onpointerdown = () => control.up = true;
+  upBtn.onpointerup = () => control.up = false;
+  upBtn.onpointerleave = () => control.up = false;
+
+  // 🔥 GLOBAL RESET (ini yang penting banget)
+  window.addEventListener("pointerup", ()=>{
+    control.left = false;
+    control.right = false;
+    control.up = false;
+  });
+}
+
+// ================= LOOP =================
+function loop(){
+
+  // 🔥 STOP TOTAL (tidak update & tidak gambar)
+  if(gameFinished) return;
+
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// ================= UPDATE =================
+function update(){
+  if(gameFinished) return;
+
+  if(inQuiz) return;
+
+  player.dx=0;
+  if(control.right) player.dx=4;
+  if(control.left) player.dx=-4;
+
+  player.x+=player.dx;
+
+  if(control.up && player.grounded){
+  player.dy=player.jump;
+  player.grounded=false;
+  soundJump(); // 🔥
+}
+
+  player.dy+=player.gravity;
+  player.y+=player.dy;
+
+  if(player.y>300){
+    player.y=300;
+    player.dy=0;
+    player.grounded=true;
+  }
+
+  // coin
+  coinsArr.forEach(c=>{
+    if(!c.collected &&
+      player.x<c.x+20 &&
+      player.x+player.w>c.x &&
+      player.y<c.y+20 &&
+      player.y+player.h>c.y){
+        c.collected=true;
+        coins++;
+soundCoin();
+    }
+  });
+
+  // quiz
+  quizBlocks.forEach((b,i)=>{
+    if(!b.done &&
+      player.x<b.x+b.w &&
+      player.x+player.w>b.x){
+        openQuiz(i);
+    }
+  });
+
+  cameraX = player.x - 200;
+}
+
+// ================= DRAW =================
+function draw(){
+  ctx.clearRect(0,0,900,400);
+
+  ctx.fillStyle="#87CEEB";
+  ctx.fillRect(0,0,900,400);
+
+  ctx.fillStyle="green";
+  ctx.fillRect(0,330,2000,70);
+
+  // coin
+  ctx.fillStyle="gold";
+  coinsArr.forEach(c=>{
+    if(!c.collected){
+      ctx.beginPath();
+      ctx.arc(c.x-cameraX,c.y,8,0,Math.PI*2);
+      ctx.fill();
+    }
+  });
+
+  // quiz
+  ctx.fillStyle="red";
+  quizBlocks.forEach(b=>{
+    if(!b.done){
+      ctx.fillRect(b.x-cameraX,b.y,40,40);
+    }
+  });
+
+  // player kucing animasi
+let x = player.x-cameraX;
+let y = player.y;
+
+// badan
+ctx.fillStyle="orange";
+ctx.fillRect(x,y,30,20);
+
+// kepala
+ctx.beginPath();
+ctx.arc(x+15,y-5,10,0,Math.PI*2);
+ctx.fill();
+
+// telinga
+ctx.beginPath();
+ctx.moveTo(x+8,y-10);
+ctx.lineTo(x+12,y-20);
+ctx.lineTo(x+16,y-10);
+ctx.fill();
+
+ctx.beginPath();
+ctx.moveTo(x+18,y-10);
+ctx.lineTo(x+22,y-20);
+ctx.lineTo(x+26,y-10);
+ctx.fill();
+
+// mata
+ctx.fillStyle="black";
+ctx.fillRect(x+10,y-5,2,2);
+ctx.fillRect(x+18,y-5,2,2);
+
+// kaki animasi
+let step = Math.sin(Date.now()*0.01)*4;
+
+ctx.fillStyle="#8b5a2b";
+ctx.fillRect(x+5,y+20+step,4,8);
+ctx.fillRect(x+18,y+20-step,4,8);
+
+// tangan
+ctx.fillRect(x-4,y+5,4,3);
+ctx.fillRect(x+30,y+5,4,3);
+
+  document.getElementById("coins").innerText=coins;
+  document.getElementById("star").innerText=star;
+}
+
+// ================= QUIZ =================
+function openQuiz(i){
+  if(inQuiz || currentQuestion>=20) return;
+
+  inQuiz=true;
+
+  let q = questionBank[currentQuestion];
+
+  document.getElementById("quizBox").classList.remove("hidden");
+  document.getElementById("question").innerText=q.q;
 
   let html="";
-
-  q.options.forEach(function(opt,i){
-    html += '<button onclick="checkAnswer('+i+')">'+opt+'</button>';
+  q.a.forEach((opt,idx)=>{
+    html+=`<button onclick="answer(${idx},${q.c},'${q.e}',${i})">${opt}</button>`;
   });
 
-  document.getElementById("options").innerHTML=html;
+  document.getElementById("answers").innerHTML=html;
 }
 
-window.checkAnswer=function(i){
-  if(isAnswered)return;
-  isAnswered=true;
+// ================= ANSWER =================
+function answer(i,c,exp,blockIndex){
 
-  let q=questions[currentQuestion];
-  let f=document.getElementById("feedback");
+  let q = questionBank[currentQuestion];
 
-  const soundBenar = document.getElementById("soundBenar");
-const soundSalah = document.getElementById("soundSalah");
+  if(i === c){
+    star++;
+    soundCorrect();
 
-if(i===q.answer){
-  benar++;
+    showFeedback(`
+      ✅ Jawaban Benar!<br><br>
+      ✔ Pilihan kamu: <b>${q.a[i]}</b><br>
+      ✔ Penjelasan: ${exp}
+    `);
 
-  soundBenar.currentTime = 0;
-  soundBenar.play();
+  }else{
+    soundWrong();
 
-  f.innerHTML='<div class="correct">Benar! 🎉</div><div>'+q.explainCorrect+'</div>';
+    showFeedback(`
+      ❌ Jawaban Salah<br><br>
+      ✔ Jawaban kamu: <b>${q.a[i]}</b><br>
+      ✔ Jawaban benar: <b>${q.a[c]}</b><br><br>
+      📘 Penjelasan:<br>${exp}
+    `);
+  }
 
-}else{
-  salah++;
+  quizBlocks[blockIndex].done = true;
+  currentQuestion++;
 
-  soundSalah.currentTime = 0;
-  soundSalah.play();
+  document.getElementById("quizBox").classList.add("hidden");
+  inQuiz = false;
 
-  f.innerHTML='<div class="wrong">Belum tepat 😊</div><div>'+q.explainWrong+'</div>';
+  if(currentQuestion === 20){
+    showResult();
+  }
 }
 
-  setTimeout(function(){
-    currentQuestion++;
-    if(currentQuestion<questions.length){
-      showQuestion();
-    }else{
-      showResult();
-    }
-  },1500);
-}
+// ================= FEEDBACK =================
+function showFeedback(text){
+  let box = document.getElementById("feedbackBox");
 
+  box.innerHTML = text; // 🔥 bukan innerText lagi
+  box.classList.remove("hidden");
+
+  setTimeout(()=>{
+    box.classList.add("hidden");
+  }, 3000);
+}
+// ================= RESULT =================
 function showResult(){
 
-  // 🔥 STOP MUSIK
-  const bgm = document.getElementById("bgm");
-  bgm.pause();
-  bgm.currentTime = 0;
-  
-  document.getElementById("game-screen").style.display="none";
-  document.getElementById("result-screen").style.display="block";
+  gameFinished = true;
 
-  document.getElementById("resultNama").innerText =
-    "Hasil " + nama;
+  // 🔊 SOUND & MUSIK
+  stopBGM();
+  soundWin();
 
-  document.getElementById("stars").innerText =
-    "⭐".repeat(benar);
+  // 🎉 KONFETI
+  startConfetti();
 
-  document.getElementById("resultScore").innerText =
-    "Benar: " + benar + " | Salah: " + salah;
+  // 🔒 STOP GERAK
+  control.left = false;
+  control.right = false;
+  control.up = false;
 
-  // 🔥 PESAN DINAMIS
-  let pesan = "";
-  let skor = (benar / questions.length) * 100;
+  player.dx = 0;
+  player.dy = 0;
 
-  if(skor >= 80){
-    pesan = "🔥 Luar biasa! Kamu sudah paham konsep dasar grafik!";
-  } else if(skor >= 60){
-    pesan = "👍 Bagus! Tinggal sedikit lagi kamu akan semakin paham!";
-  } else if(skor >= 40){
-    pesan = "😊 Semangat! Kamu sudah mulai memahami, ayo lanjut belajar!";
-  } else {
-    pesan = "💪 Jangan menyerah! Ini baru awal, kita belajar bersama ya!";
-  }
-
-  document.getElementById("resultMessage").innerText = pesan;
-
-  // simpan data tetap jalan
-  simpanData();
+  document.getElementById("resultBox").classList.remove("hidden");
+  document.getElementById("resultBox").innerHTML=`
+    <h2>🎉 GAME SELESAI</h2>
+    <p>⭐ Skor: ${star}</p>
+    <p>🪙 Koin: ${coins}</p>
+    <p style="margin-top:10px;">🔥 Keren! Kamu berhasil menyelesaikan game!</p>
+    
+  `;
+  bgMusic.pause();
+bgMusic.currentTime = 0;
 }
 
-function simpanData(){
-  let data = JSON.parse(localStorage.getItem("hasilGame")) || [];
-
-  let skor = Math.round((benar / questions.length) * 100);
-
-  data.push({
-    nama: nama,
-    benar: benar,
-    salah: salah,
-    skor: skor
-  });
-
-  localStorage.setItem("hasilGame", JSON.stringify(data));
+function playBGM(){
+  bgMusic = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9bfa1a.mp3?filename=game-music-loop-2-144037.mp3");
+  bgMusic.loop = true;
+  bgMusic.volume = 0.3;
+  bgMusic.play();
 }
 
-window.lihatDashboard = function(){
-
-  document.getElementById("result-screen").style.display="none";
-  document.getElementById("dashboard-screen").style.display="block";
-
-  let data = JSON.parse(localStorage.getItem("hasilGame")) || [];
-  let tbody = document.querySelector("#dataTable tbody");
-
-  tbody.innerHTML = "";
-
-  if(data.length === 0){
-    tbody.innerHTML = "<tr><td colspan='4'>Belum ada data</td></tr>";
-    return;
-  }
-
-  data.forEach(d => {
-    let row = `
-      <tr>
-        <td>${d.nama}</td>
-        <td>${d.benar}</td>
-        <td>${d.salah}</td>
-        <td>${d.skor}</td>
-      </tr>
-    `;
-    tbody.innerHTML += row;
-  });
-}
-
-window.downloadExcel = function(){
-
-  let data = JSON.parse(localStorage.getItem("hasilGame")) || [];
-
-  let csv = "Nama,Benar,Salah,Skor\n";
-
-  data.forEach(d => {
-    csv += `${d.nama},${d.benar},${d.salah},${d.skor}\n`;
-  });
-
-  let blob = new Blob([csv], { type: "text/csv" });
-  let url = URL.createObjectURL(blob);
-
-  let a = document.createElement("a");
-  a.href = url;
-  a.download = "hasil_pretest.csv";
-  a.click();
-}
-
-window.resetDashboard = function(){
-
-  let konfirmasi = confirm("Yakin ingin menghapus semua data?");
-
-  if(konfirmasi){
-    localStorage.removeItem("hasilGame");
-
-    alert("Data berhasil dihapus!");
-
-    // refresh tabel
-    let tbody = document.querySelector("#dataTable tbody");
-    tbody.innerHTML = "<tr><td colspan='4'>Belum ada data</td></tr>";
+function stopBGM(){
+  if(bgMusic){
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
   }
 }
-
-window.kembaliKeAwal = function(){
-
-  // reset tampilan saja (bukan data)
-  document.getElementById("dashboard-screen").style.display = "none";
-  document.getElementById("result-screen").style.display = "none";
-  document.getElementById("game-screen").style.display = "none";
-  document.getElementById("start-screen").style.display = "block";
-
-  // reset variabel game (biar mulai dari awal lagi)
-  currentQuestion = 0;
-  benar = 0;
-  salah = 0;
-  isAnswered = false;
-
-  // stop musik
-  const bgm = document.getElementById("bgm");
-  if(bgm){
-    bgm.pause();
-    bgm.currentTime = 0;
-  }
+function soundWin(){
+  beep(600,0.2);
+  setTimeout(()=>beep(800,0.2),150);
+  setTimeout(()=>beep(1000,0.3),300);
 }
 
-let musicPlaying = false;
+bgMusic.loop = true;     // 🔁 ulang terus
+bgMusic.volume = 0.4;    // 🔊 volume nyaman
 
-window.toggleMusic = function(){
-  const bgm = document.getElementById("bgm");
+function startConfetti(){
+  for(let i=0;i<100;i++){
+    let div = document.createElement("div");
 
-  if(musicPlaying){
-    bgm.pause();
-    musicPlaying = false;
-  } else {
-    bgm.play().catch(()=>{});
-    musicPlaying = true;
+    div.style.position = "fixed";
+    div.style.top = "-10px";
+    div.style.left = Math.random()*100 + "%";
+    div.style.width = "8px";
+    div.style.height = "8px";
+    div.style.background = `hsl(${Math.random()*360},100%,50%)`;
+    div.style.zIndex = "9999";
+    div.style.borderRadius = "50%";
+
+    div.style.animation = `fall ${Math.random()*2+2}s linear`;
+
+    document.body.appendChild(div);
+
+    setTimeout(()=>div.remove(),4000);
   }
 }
-
-});

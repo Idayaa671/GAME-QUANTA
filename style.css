@@ -1,121 +1,139 @@
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(to right, #4facfe, #a18cd1);
-  margin: 0;
-  padding: 0;
-}
-
-.container {
-  background: white;
-  padding: 20px;
-  margin: 40px auto;
-  width: 90%;
-  max-width: 400px;
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  text-align: center;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 10px;
-  background-color: #ff9a9e;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:active {
-  transform: scale(0.95);
-}
-
-button:hover {
-  background-color: #ff6a88;
-}
-
-input {
-  padding: 10px;
-  width: 90%;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-.correct {
-  color: green;
-  font-weight: bold;
-}
-
-.wrong {
-  color: orange;
-  font-weight: bold;
-}
-.explain{
-  margin-top:8px;
-  font-size:14px;
-  color:#444;
-}
-
-/* GAMBAR BIAR TIDAK KELUAR LAYAR */
-img{
-  max-width:100%;
-  height:auto;
-  border-radius:10px;
-}
-
-/* TABEL DASHBOARD */
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-}
-
-th, td{
-  padding:8px;
-  border:1px solid #ddd;
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
   text-align:center;
 }
 
-/* 📱 HP */
-@media (max-width:480px){
-
-  .container{
-    margin:20px auto;
-    padding:15px;
-  }
-
-  h2{
-    font-size:20px;
-  }
-
-  h3{
-    font-size:18px;
-  }
-
-  button{
-    font-size:14px;
-    padding:10px;
-  }
-
+/* MENU */
+#menu{
+  padding:50px;
 }
 
-/* 📟 TABLET */
-@media (min-width:481px) and (max-width:768px){
-
-  .container{
-    max-width:500px;
-  }
-
+.ilustrasi{
+  width:200px;
+  height:150px;
+  margin:20px auto;
+  background:linear-gradient(to top,#22c55e,#38bdf8);
+  border-radius:20px;
+  animation:float 2s infinite alternate;
 }
 
-/* 💻 DESKTOP */
-@media (min-width:769px){
+@keyframes float{
+  from{transform:translateY(0);}
+  to{transform:translateY(-10px);}
+}
 
-  .container{
-    max-width:600px;
+button{
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  background:#22c55e;
+  color:white;
+  cursor:pointer;
+}
+
+.hidden{display:none;}
+
+canvas{
+  display:block;
+  margin:auto;
+  border:3px solid #22c55e;
+  background:linear-gradient(#38bdf8,#4ade80);
+}
+
+/* CONTROL */
+#controls{
+  position:fixed;
+  bottom:10px;
+  width:100%;
+}
+
+/* QUIZ */
+#quizBox{
+  position:absolute;
+  top:20%;
+  left:50%;
+  transform:translateX(-50%);
+  background:#111;
+  padding:20px;
+  border-radius:15px;
+  width:300px;
+}
+
+/* FEEDBACK */
+#feedbackBox{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  padding:20px;
+  border-radius:15px;
+  background:#111;
+}
+
+/* ===== MENU LEBIH HIDUP ===== */
+#menu{
+  padding:50px;
+  background:linear-gradient(to bottom,#0f172a,#1e293b);
+}
+
+/* animasi anak + grafik */
+.ilustrasi{
+  width:220px;
+  height:150px;
+  margin:20px auto;
+  background:linear-gradient(135deg,#22c55e,#38bdf8);
+  border-radius:20px;
+  position:relative;
+  overflow:hidden;
+}
+
+/* grafik animasi */
+.ilustrasi::after{
+  content:"";
+  position:absolute;
+  width:100%;
+  height:100%;
+  border-bottom:3px solid cyan;
+  border-radius:50%;
+  transform:scaleX(1.2) scaleY(0.6);
+  animation:graphMove 2s infinite alternate;
+}
+
+@keyframes graphMove{
+  from{transform:scaleX(0.8) scaleY(0.4);}
+  to{transform:scaleX(1.2) scaleY(0.6);}
+}
+
+/* tombol lebih menarik */
+button{
+  padding:12px 20px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:white;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover{
+  transform:scale(1.1);
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(100vh) rotate(720deg);
   }
+}
 
+button {
+cursor: pointer;
+touch-action: manipulation;
+}
+canvas {
+width: 100% !important;
+height: auto !important;
+max-width: 600px;
 }
