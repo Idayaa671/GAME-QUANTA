@@ -1,0 +1,121 @@
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to right, #4facfe, #a18cd1);
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  background: white;
+  padding: 20px;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 10px;
+  background-color: #ff9a9e;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+button:hover {
+  background-color: #ff6a88;
+}
+
+input {
+  padding: 10px;
+  width: 90%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.correct {
+  color: green;
+  font-weight: bold;
+}
+
+.wrong {
+  color: orange;
+  font-weight: bold;
+}
+.explain{
+  margin-top:8px;
+  font-size:14px;
+  color:#444;
+}
+
+/* GAMBAR BIAR TIDAK KELUAR LAYAR */
+img{
+  max-width:100%;
+  height:auto;
+  border-radius:10px;
+}
+
+/* TABEL DASHBOARD */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+
+th, td{
+  padding:8px;
+  border:1px solid #ddd;
+  text-align:center;
+}
+
+/* 📱 HP */
+@media (max-width:480px){
+
+  .container{
+    margin:20px auto;
+    padding:15px;
+  }
+
+  h2{
+    font-size:20px;
+  }
+
+  h3{
+    font-size:18px;
+  }
+
+  button{
+    font-size:14px;
+    padding:10px;
+  }
+
+}
+
+/* 📟 TABLET */
+@media (min-width:481px) and (max-width:768px){
+
+  .container{
+    max-width:500px;
+  }
+
+}
+
+/* 💻 DESKTOP */
+@media (min-width:769px){
+
+  .container{
+    max-width:600px;
+  }
+
+}

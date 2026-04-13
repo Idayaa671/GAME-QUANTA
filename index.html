@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fun Graph Game</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- 🎵 Background Music -->
+<audio id="bgm" loop preload="auto">
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🔊 Sound Effect -->
+<audio id="soundBenar">
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_3c3bdf2c8b.mp3">
+</audio>
+
+<audio id="soundSalah">
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_2f0b6d3d03.mp3">
+</audio>
+
+<!-- START SCREEN -->
+<div class="container" id="start-screen">
+  <h2>🎮 Fun Graph Game</h2>
+  <p>Yuk main sebentar sebelum belajar 😄</p>
+
+  <input 
+    type="text" 
+    id="namaInput" 
+    placeholder="Masukkan nama kamu"
+    autocomplete="off"
+  >
+
+  <button id="startBtn">🚀 Mulai Game</button><button onclick="toggleMusic()">🔊 Musik ON/OFF</button>
+
+</div>
+
+<!-- GAME SCREEN -->
+<div class="container" id="game-screen" style="display:none;">
+  
+  <p id="progress"></p>
+  
+  <h3 id="question"></h3>
+
+  <!-- GAMBAR SOAL -->
+  <img 
+    id="questionImage" 
+    style="max-width:100%; margin:10px 0; display:none; border-radius:10px;"
+  >
+
+  <!-- OPSI JAWABAN -->
+  <div id="options"></div>
+
+  <!-- FEEDBACK -->
+  <p id="feedback"></p>
+
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="container" id="result-screen" style="display:none;">
+  
+  <h2 id="resultNama"></h2>
+  
+  <h3 id="stars"></h3>
+  
+  <p id="resultScore"></p>
+  
+  <p id="resultMessage"></p>
+
+  <button onclick="location.reload()">🔄 Main Lagi</button>
+<button onclick="lihatDashboard()">📊 Lihat Dashboard</button>
+</div>
+
+<div class="container" id="dashboard-screen" style="display:none;">
+  <h2>📊 Dashboard Hasil</h2>
+
+  <table border="1" width="100%" id="dataTable">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Benar</th>
+        <th>Salah</th>
+        <th>Skor</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button onclick="downloadExcel()">⬇️ Export Excel</button>
+  <button onclick="resetDashboard()">🗑 Reset Data</button>
+<button onclick="kembaliKeAwal()">⬅️ Kembali</button>
+</div>
+
+<!-- SCRIPT -->
+<script src="script.js"></script>
+
+</body>
+</html>
