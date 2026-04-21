@@ -38,6 +38,7 @@ function soundWrong(){ beep(200,0.2); }
 // ================= CANVAS =================
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
 canvas.width = 900;
 canvas.height = 400;
 
@@ -55,28 +56,28 @@ let gameFinished = false;
 
 // ================= BANK SOAL (20) =================
 const questionBank = [
-{q:"Grafik y=x² berbentuk?",a:["Garis","Parabola"],c:1,e:"Fungsi kuadrat berbentuk parabola"},
-{q:"Jika a > 0?",a:["Ke atas","Ke bawah"],c:0,e:"a positif → atas"},
-{q:"Jika a < 0?",a:["Ke bawah","Ke atas"],c:0,e:"a negatif → bawah"},
-{q:"Titik puncak?",a:["Gradien","Vertex"],c:1,e:"Vertex = puncak"},
-{q:"Diskriminan > 0?",a:["2 akar","0 akar"],c:0,e:"Memotong di 2 titik"},
-{q:"y=x²+2 geser?",a:["Turun","Naik"],c:1,e:"+2 → ke atas"},
-{q:"y=(x-3)² geser?",a:["Kanan","Kiri"],c:0,e:"(x-3) → kanan"},
-{q:"x²-4x+4 akar?",a:["1","2"],c:0,e:"D=0 → 1 akar"},
-{q:"Sumbu simetri x²-4x?",a:["x=4","x=2"],c:1,e:"-b/2a"},
-{q:"Jika a besar?",a:["Curam","Landai"],c:0,e:"a besar → curam"},
+{q:"Grafik y=x² berbentuk?",a:["Parabola","Garis"],c:0,e:"Fungsi kuadrat berbentuk parabola"},
+{q:"Jika a > 0 maka arah grafik ke?",a:["Ke atas","Ke bawah"],c:0,e:"a positif → atas"},
+{q:"Jika a < 0 maka arah grafik ke?",a:["Ke bawah","Ke atas"],c:0,e:"a negatif → bawah"},
+{q:"Titik puncak grafik fungsi kuadrat di sebut?",a:["Vertex","Gradien"],c:0,e:"Vertex = puncak"},
+{q:"Diskriminan > 0 memiliki beraopa akar?",a:["2 akar","0 akar"],c:0,e:"Memotong di 2 titik"},
+{q:"jika y=x²+2 maka grafik geser ke arah?",a:["Naik","Turun"],c:0,e:"+2 → ke atas"},
+{q:"Grafiky=(x-3)² mengalami pergeseran ke arah?",a:["Kanan","Kiri"],c:0,e:"(x-3) → kanan"},
+{q:"Berapa banyak akar real yang dimiliki oleh persamaan x²-4x+4=0 ?",a:["1","2"],c:0,e:"D=0 → 1 akar"},
+{q:"Sumbu simetri dari persamaan  x²-4x adalah?",a:["x=2","x=4"],c:0,e:"-b/2a"},
+{q:"Bagaima karakteristik grafik fungsi kuadrat jika nilai a semakin besar?",a:["Curam","Landai"],c:0,e:"a besar → curam"},
 
-{q:"y=x²-6x+9?",a:["1 titik","2 titik"],c:0,e:"D=0"},
-{q:"Parabola di atas X?",a:["Tidak ada akar","2 akar"],c:0,e:"Tidak memotong"},
-{q:"y=-x² grafik?",a:["Atas","Bawah"],c:1,e:"a negatif"},
-{q:"y=x²+4x+4 puncak?",a:["(2,0)","(-2,0)"],c:1,e:"Lengkap kuadrat"},
-{q:"y=x²+1 potong X?",a:["Tidak","Ya"],c:0,e:"Tidak punya akar"},
+{q:"Berapakah jumlah titik potong grafiky=x²-6x+9 dengan sumbu x?",a:["1 titik","2 titik"],c:0,e:"D=0"},
+{q:"Jika grafik Parabola berada sepenuhnya di atas sumbu X (tidak memotong maupun menyentuh) bagaimana kondisi akar-akarnya ?",a:["Tidak ada akar","2 akar"],c:0,e:"Tidak memotong"},
+{q:"Kemana arah terbuka grafik fungsi kudrat y=-x² grafik?",a:["Bawah","Atas"],c:0,e:"a negatif"},
+{q:"Dimana letak titk puncak dari grafik fungsi kuadrat y=x²+4x+4?",a:["(-2,0)","(2,0)"],c:0,e:"Lengkap kuadrat"},
+{q:"Apakah grafik fungsi kuadraty=x²+1 memotong sumbuX?",a:["Tidak","Ya"],c:0,e:"Tidak punya akar"},
 
-{q:"Bola y=-x²+4x tinggi max?",a:["x=2","x=4"],c:0,e:"-b/2a"},
-{q:"y=2x² lebih?",a:["Curam","Landai"],c:0,e:"a besar"},
-{q:"y=0x²+2?",a:["Parabola","Garis"],c:1,e:"a=0 → garis"},
-{q:"y=x²-1 potong?",a:["2 titik","1 titik"],c:0,e:"D>0"},
-{q:"Grafik parabola?",a:["Lurus","Melengkung"],c:1,e:"Parabola melengkung"}
+{q:"Pada detik ke berapa Bola mencapai titik maksimium jika lintasnya mengikuti persamaan y=-x²+4x?",a:["x=2","x=4"],c:0,e:"-b/2a"},
+{q:"Bagaimana bentuk grafik y=2x² jikadibandingkan dengan grafik fungsi induk y=x² ?",a:["Curam","Landai"],c:0,e:"a besar"},
+{q:"Bentuk grafik yang di hasilkan dari persamaan y=0x²+2?",a:["Garis","Parabola"],c:0,e:"a=0 → garis"},
+{q:"Ada berapa banyak titik potong grafik fungsi y=x²-1 terhadap sumbu x ?",a:["2 titik","1 titik"],c:0,e:"D>0"},
+{q:"Bagaimana bentuk lintasan atau gambar daari sebuah grafik fungsi kuadrat (parabola)?",a:["Melengkung","Lurus"],c:0,e:"Parabola melengkung"}
 ];
 
 // ================= START =================
