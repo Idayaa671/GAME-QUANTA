@@ -62,7 +62,7 @@ const questionBank = [
 {q:"Titik puncak grafik fungsi kuadrat di sebut?",a:["Vertex","Gradien"],c:0,e:"Vertex = puncak"},
 {q:"Diskriminan > 0 memiliki beraopa akar?",a:["2 akar","0 akar"],c:0,e:"Memotong di 2 titik"},
 {q:"jika y=x²+2 maka grafik geser ke arah?",a:["Naik","Turun"],c:0,e:"+2 → ke atas"},
-{q:"Grafiky=(x-3)² mengalami pergeseran ke arah?",a:["Kanan","Kiri"],c:0,e:"(x-3) → kanan"},
+{q:"Grafiky=(x-3)² mengalami pergeseran ke arah?",a:["Kanan","Kiri"],c:0,e:"(x-3)²  → kanan"},
 {q:"Berapa banyak akar real yang dimiliki oleh persamaan x²-4x+4=0 ?",a:["1","2"],c:0,e:"D=0 → 1 akar"},
 {q:"Sumbu simetri dari persamaan  x²-4x adalah?",a:["x=2","x=4"],c:0,e:"-b/2a"},
 {q:"Bagaima karakteristik grafik fungsi kuadrat jika nilai a semakin besar?",a:["Curam","Landai"],c:0,e:"a besar → curam"},
